@@ -29,7 +29,7 @@ def Id():
 def Username():
     return "udername" # insert here your username
 def botToken():
-    return "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I"
+    return "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I" # do not change this id
 
 # api
 def notifyTelegramPoint():
