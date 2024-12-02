@@ -25,9 +25,9 @@ def greenSquare():
 def redSquare():
     return u'\U0000274C'
 def Id():
-    return 737372475
+    return 123456789 # insert here your id
 def Username():
-    return "teoilpiumatteo"
+    return "udername" # insert here your username
 def botToken():
     return "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I"
 
