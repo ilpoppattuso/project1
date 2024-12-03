@@ -19,9 +19,9 @@ import warnings
 # Constants
 GREEN_CHECK = u'\U00002705'
 RED_CROSS = u'\U0000274C'
-BOT_ID = 737372475  # Replace with your Telegram ID
-BOT_USERNAME = "teoilpiumatteo"  # Replace with your username
-BOT_TOKEN = "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I"  # Replace with your bot token
+BOT_ID = 123456789  # Replace with your Telegram ID
+BOT_USERNAME = "username"  # Replace with your username
+BOT_TOKEN = "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I"  # Replace with your bot token or keep this to use as a template
 
 # Utility functions
 def notify_telegram_status(message):
